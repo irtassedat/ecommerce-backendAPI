@@ -1,0 +1,18 @@
+server:
+  servlet:
+    context-path: /ecommerce-backend
+  port: 8080
+
+spring:
+  application:
+    name: ecommerce-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: kaputdrakonis1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: public
