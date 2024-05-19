@@ -1,11 +1,13 @@
 package com.workintech.ecommercebackend.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.util.Set;
 
+@Data
 @Entity
 @Table(name = "roles")
 @AllArgsConstructor
@@ -17,8 +19,6 @@ public class Role {
 
     private String name;
 
-    @OneToMany(mappedBy = "role")
-    private Set<User> users;
 
 }
 

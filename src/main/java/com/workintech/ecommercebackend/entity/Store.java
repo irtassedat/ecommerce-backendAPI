@@ -1,24 +1,25 @@
 package com.workintech.ecommercebackend.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import java.util.Set;
 
+@Data
 @Entity
-@Table(name = "product_category")
+@Table(name = "stores")
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductCategory {
+public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @OneToMany(mappedBy = "store")
+    private Set<Product> products;
+
 }

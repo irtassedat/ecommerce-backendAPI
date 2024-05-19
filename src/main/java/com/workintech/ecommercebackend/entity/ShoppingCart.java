@@ -1,11 +1,13 @@
 package com.workintech.ecommercebackend.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.util.Set;
 
+@Data
 @Entity
 @Table(name = "shopping_carts")
 @AllArgsConstructor
@@ -21,7 +23,4 @@ public class ShoppingCart {
 
     @OneToMany(mappedBy = "shoppingCart")
     private Set<Product> products;
-
 }
-
-

@@ -1,10 +1,12 @@
 package com.workintech.ecommercebackend.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+@Data
 @Entity
 @Table(name = "cards")
 @AllArgsConstructor

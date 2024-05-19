@@ -1,10 +1,12 @@
 package com.workintech.ecommercebackend.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+@Data
 @Entity
 @Table(name = "addresses")
 @AllArgsConstructor
@@ -14,18 +16,17 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String street;
-
+    private String title;
+    private String name;
+    private String surname;
+    private String phone;
     private String city;
-
-    private String state;
-
-    private String postalCode;
+    private String district;
+    private String neighborhood;
+    private String address;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    // Getters and Setters
 }
 
