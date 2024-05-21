@@ -11,13 +11,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -25,8 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<User> getAllUsers() {
@@ -41,14 +39,34 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
-        Set<Role> roles = user.getRoles();
-        for (Role role : roles) {
-            Role existingRole = roleRepository.findById(role.getId()).orElseThrow(() -> new RuntimeException("Role not found"));
-            role.setName(existingRole.getName());
+        // Şifreyi encode ederek kaydedelim
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Kullanıcıya varsayılan rol atayalım
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            Role userRole = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Default role not found"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
+            user.setRoles(roles);
+        } else {
+            Set<Role> roles = new HashSet<>();
+            for (Role role : user.getRoles()) {
+                Role existingRole = roleRepository.findById(role.getId())
+                        .orElseThrow(() -> new RuntimeException("Role not found"));
+                roles.add(existingRole);
+            }
+            user.setRoles(roles);
         }
-        user.setRoles(roles);
+
+        // Name alanı boşsa hata fırlat
+        if (user.getName() == null || user.getName().isEmpty()) {
+            throw new RuntimeException("Name is required");
+        }
+
         return userRepository.save(user);
     }
+
 
     @Override
     public User updateUser(Long id, User user) {
@@ -56,7 +74,7 @@ public class UserServiceImpl implements UserService {
         if (existingUser != null) {
             existingUser.setName(user.getName());
             existingUser.setEmail(user.getEmail());
-            existingUser.setPassword(user.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             existingUser.setRoles(user.getRoles());
             return userRepository.save(existingUser);
         }
@@ -70,8 +88,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User loginUser(LoginDto loginDto) {
-        return userRepository.findByEmailAndPassword(loginDto.getEmail(), loginDto.getPassword())
+        User user = userRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            return user;
+        } else {
+            throw new RuntimeException("Invalid email or password");
+        }
     }
 
     @Override
@@ -79,10 +102,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        Set<org.springframework.security.core.GrantedAuthority> grantedAuthorities = new HashSet<>();
-        user.getRoles().forEach(role -> {
-            grantedAuthorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(role.getName()));
-        });
+        Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
+        for (Role role : user.getRoles()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())

@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import java.util.Set;
 
 @Data
 @Entity
@@ -18,7 +17,4 @@ public class Role {
     private Long id;
 
     private String name;
-
-
 }
-
