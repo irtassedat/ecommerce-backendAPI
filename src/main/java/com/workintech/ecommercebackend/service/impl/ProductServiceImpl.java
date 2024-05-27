@@ -17,19 +17,18 @@ import com.workintech.ecommercebackend.exception.ResourceNotFoundException;
 import com.workintech.ecommercebackend.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import com.workintech.ecommercebackend.entity.Product;
 import com.workintech.ecommercebackend.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
-
 
     private final ProductRepository productRepository;
 
@@ -46,9 +45,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Optional<ProductDto> getProductById(Long id) {
         logger.info("Fetching product with id: {}", id);
-        return productRepository.findById(id).map(this::convertToDto);
+        Optional<Product> productOpt = productRepository.findById(id);
+        if (productOpt.isPresent()) {
+            Product product = productOpt.get();
+            // Manually initialize collections
+            Hibernate.initialize(product.getCategories());
+            Hibernate.initialize(product.getImages());
+            return Optional.of(convertToDto(product));
+        }
+        return Optional.empty();
     }
-
 
     @Override
     @Transactional
@@ -116,6 +122,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productDto;
     }
+
     private Product convertToEntity(ProductDto productDto) {
         Product product = new Product();
         product.setName(productDto.getName());
@@ -154,6 +161,7 @@ public class ProductServiceImpl implements ProductService {
 
         return product;
     }
+
     private void updateEntityFromDto(Product existingProduct, ProductDto productDto) {
         existingProduct.setName(productDto.getName());
         existingProduct.setDescription(productDto.getDescription());
@@ -188,6 +196,4 @@ public class ProductServiceImpl implements ProductService {
                 }).collect(Collectors.toSet());
         existingProduct.setImages(images);
     }
-
 }
-

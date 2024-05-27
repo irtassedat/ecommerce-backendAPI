@@ -20,7 +20,6 @@ public class ProductController {
     @GetMapping
     public List<ProductDto> getAllProducts() {
         return productService.getAllProducts();
-
     }
 
     @GetMapping("/{id}")
@@ -29,8 +28,6 @@ public class ProductController {
         return productDto.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + id));
     }
-
-
 
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
@@ -50,4 +47,5 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 }
+
 
