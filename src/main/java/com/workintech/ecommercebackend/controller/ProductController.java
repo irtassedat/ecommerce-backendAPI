@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.workintech.ecommercebackend.dto.ProductDto;
 import com.workintech.ecommercebackend.exception.ResourceNotFoundException;
+import com.workintech.ecommercebackend.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import com.workintech.ecommercebackend.service.ProductService;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
@@ -42,10 +44,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+        if (productRepository.existsById(id)) {
+            throw new RuntimeException("Product was not deleted");
+        }
+        return ResponseEntity.ok("Product successfully deleted");
     }
+
 }
 
 

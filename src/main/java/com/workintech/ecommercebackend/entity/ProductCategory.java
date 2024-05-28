@@ -1,5 +1,6 @@
 package com.workintech.ecommercebackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +17,11 @@ public class ProductCategory {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnoreProperties("productCategories")
     private Product product;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties("productCategories")
     private Category category;
 }

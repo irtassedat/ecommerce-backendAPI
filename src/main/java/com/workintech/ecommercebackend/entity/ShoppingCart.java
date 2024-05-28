@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import java.util.Set;
@@ -21,8 +22,10 @@ public class ShoppingCart {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("shoppingCart")
     private User user;
 
     @OneToMany(mappedBy = "shoppingCart")
+    @JsonIgnoreProperties("shoppingCart")
     private Set<Product> products;
 }

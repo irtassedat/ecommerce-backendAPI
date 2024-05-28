@@ -1,5 +1,6 @@
 package com.workintech.ecommercebackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +25,7 @@ public class Category {
     private double rating;
     private String gender;
 
-    @ManyToMany(mappedBy = "categories")
-    @JsonIgnoreProperties("categories")  // To prevent infinite recursion
+    @ManyToMany(mappedBy = "categories", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("categories")
     private Set<Product> products;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductCategory> productCategories;
 }
