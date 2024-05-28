@@ -1,0 +1,4 @@
+Database ID sequence update:
+
+-- Update product ID sequence to prevent duplicate key errors
+SELECT setval('products_id_seq', (SELECT MAX(id) FROM products) + 1);
