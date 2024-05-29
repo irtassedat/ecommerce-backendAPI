@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.workintech.ecommercebackend.dto.ProductDto;
 import com.workintech.ecommercebackend.entity.Category;
 import com.workintech.ecommercebackend.entity.Product;
+import com.workintech.ecommercebackend.entity.ProductCategory;
 import com.workintech.ecommercebackend.exception.ProductServiceException;
 import com.workintech.ecommercebackend.exception.ResourceNotFoundException;
 import com.workintech.ecommercebackend.mapper.ProductMapper;
@@ -14,7 +15,7 @@ import com.workintech.ecommercebackend.repository.ProductCategoryRepository;
 import com.workintech.ecommercebackend.repository.ProductImageRepository;
 import com.workintech.ecommercebackend.repository.ProductRepository;
 import com.workintech.ecommercebackend.service.ProductService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -32,28 +33,39 @@ public class ProductServiceImpl implements ProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final ProductImageRepository productImageRepository;
 
+
+    private void fillProductCategories(Product product) {
+        List<ProductCategory> productCategoryList = productCategoryRepository.findProductCategoriesByProduct_Id(product.getId());
+        for (ProductCategory productCategory : productCategoryList) {
+            product.getCategories().add(productCategory.getCategory());
+        }
+    }
+
     @Override
+    @Transactional(readOnly = true)
     public List<ProductDto> getAllProducts() {
         logger.info("Fetching all products");
         List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
             throw new ProductServiceException("No products found.");
         }
+        products.forEach(this::fillProductCategories);
         return products.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductDto> getProductById(Long id) {
         logger.info("Fetching product with id: {}", id);
         Optional<Product> productOpt = productRepository.findById(id);
         if (productOpt.isPresent()) {
             Product product = productOpt.get();
-            // Manually initialize collections
-            Hibernate.initialize(product.getCategories());
-            Hibernate.initialize(product.getImages());
+            fillProductCategories(product);
             return Optional.of(productMapper.toDto(product));
+        } else {
+            logger.error("Product not found with id: {}", id);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override

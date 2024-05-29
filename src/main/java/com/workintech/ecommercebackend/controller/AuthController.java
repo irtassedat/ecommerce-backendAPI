@@ -2,6 +2,7 @@ package com.workintech.ecommercebackend.controller;
 
 import com.workintech.ecommercebackend.dto.LoginDto;
 import com.workintech.ecommercebackend.entity.User;
+import com.workintech.ecommercebackend.service.AuthService;
 import com.workintech.ecommercebackend.service.UserService;
 import com.workintech.ecommercebackend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,13 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.createUser(user);
-        return ResponseEntity.ok("User registered successfully");
+    @Autowired
+    private AuthService authService;
+
+    @PostMapping(value = "/register", consumes = "application/json")
+    public ResponseEntity<User> register(@RequestBody User user) {
+        User registeredUser = authService.register(user);
+        return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")

@@ -2,6 +2,7 @@ package com.workintech.ecommercebackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,12 +15,11 @@ import java.util.Set;
 @Table(name = "products")
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"categories", "images"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String description;
     private double price;
@@ -30,10 +30,12 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "store_id")
+    @JsonBackReference
     private Store store;
 
     @ManyToOne
     @JoinColumn(name = "shopping_cart_id")
+    @JsonBackReference
     private ShoppingCart shoppingCart;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -42,10 +44,10 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @JsonIgnoreProperties("products")
+    @JsonManagedReference
     private Set<Category> categories;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("product")
+    @JsonManagedReference
     private Set<ProductImage> images;
 }

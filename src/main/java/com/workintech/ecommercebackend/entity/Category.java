@@ -14,11 +14,11 @@ import java.util.Set;
 @Table(name = "categories")
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String code;
     private String title;
     private String img;
@@ -26,6 +26,6 @@ public class Category {
     private String gender;
 
     @ManyToMany(mappedBy = "categories", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("categories")
+    @JsonBackReference
     private Set<Product> products;
 }
