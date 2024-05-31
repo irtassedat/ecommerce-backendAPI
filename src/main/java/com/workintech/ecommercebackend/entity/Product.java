@@ -30,12 +30,10 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "store_id")
-    @JsonBackReference
     private Store store;
 
     @ManyToOne
     @JoinColumn(name = "shopping_cart_id")
-    @JsonBackReference
     private ShoppingCart shoppingCart;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -44,10 +42,9 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @JsonManagedReference
     private Set<Category> categories;
 
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
     private Set<ProductImage> images;
 }

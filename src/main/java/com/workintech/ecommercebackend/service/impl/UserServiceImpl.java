@@ -3,6 +3,7 @@ package com.workintech.ecommercebackend.service.impl;
 import com.workintech.ecommercebackend.dto.LoginDto;
 import com.workintech.ecommercebackend.entity.Role;
 import com.workintech.ecommercebackend.entity.User;
+import com.workintech.ecommercebackend.repository.AddressRepository;
 import com.workintech.ecommercebackend.repository.RoleRepository;
 import com.workintech.ecommercebackend.repository.UserRepository;
 import com.workintech.ecommercebackend.service.UserService;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -52,12 +54,16 @@ public class UserServiceImpl implements UserService {
         } else {
             Set<Role> roles = new HashSet<>();
             for (Role role : user.getRoles()) {
-                Role existingRole = roleRepository.findById(role.getId())
-                        .orElseThrow(() -> new RuntimeException("Role not found"));
+                Role existingRole = roleRepository.findById(role.getId()).orElse(null);
                 roles.add(existingRole);
             }
             user.setRoles(roles);
         }
+
+        user.getAddresses().forEach(address -> {
+            addressRepository.save(address);
+        });
+
 
         // Name alanı boşsa hata fırlat
         if (user.getName() == null || user.getName().isEmpty()) {

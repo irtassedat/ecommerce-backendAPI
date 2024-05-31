@@ -17,6 +17,3 @@ spring:
       hibernate:
         default_schema: public
 
-logging:
-  level:
-    root: DEBUG

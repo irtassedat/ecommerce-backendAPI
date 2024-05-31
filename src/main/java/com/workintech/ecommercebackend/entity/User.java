@@ -1,9 +1,6 @@
 package com.workintech.ecommercebackend.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -30,7 +27,7 @@ public class User {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -38,15 +35,12 @@ public class User {
     @JsonIgnoreProperties("users")
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonBackReference(value = "user-address")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Address> addresses;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonBackReference(value = "user-card")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Card> cards;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference(value = "user-shoppingCart")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private ShoppingCart shoppingCart;
 }
