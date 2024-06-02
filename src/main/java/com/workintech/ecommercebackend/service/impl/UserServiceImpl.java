@@ -60,10 +60,14 @@ public class UserServiceImpl implements UserService {
             user.setRoles(roles);
         }
 
+        // Check if the addresses field is null and initialize it if necessary
+        if (user.getAddresses() == null) {
+            user.setAddresses(new HashSet<>());
+        }
+
         user.getAddresses().forEach(address -> {
             addressRepository.save(address);
         });
-
 
         // Name alanı boşsa hata fırlat
         if (user.getName() == null || user.getName().isEmpty()) {

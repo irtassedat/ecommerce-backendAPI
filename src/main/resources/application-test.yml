@@ -9,7 +9,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: kaputdrakonis1
+    password: gizLiceriQ
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -17,4 +17,3 @@ spring:
     properties:
       hibernate:
         default_schema: public
-
